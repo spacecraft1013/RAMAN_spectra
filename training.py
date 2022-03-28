@@ -2,7 +2,6 @@ from torch.autograd import Variable
 from torch import nn
 import torch
 import numpy as np
-from tqdm import tqdm
 
 
 def run_epoch(epoch, model, dataloader, training=False, optimizer=None, device=0):
