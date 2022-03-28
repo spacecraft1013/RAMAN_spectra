@@ -13,8 +13,7 @@ def run_epoch(epoch, model, dataloader, cuda, training=False, optimizer=None):
     total_loss = 0
     correct = 0
     total = 0
-    progressbar = tqdm(enumerate(dataloader), total=len(dataloader))
-    for batch_idx, (inputs, targets) in progressbar:
+    for batch_idx, (inputs, targets) in enumerate(dataloader):
         if cuda: inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs), Variable(targets.long())
         outputs = model(inputs)
@@ -31,7 +30,6 @@ def run_epoch(epoch, model, dataloader, cuda, training=False, optimizer=None):
             correct += predicted.eq(targets.data).cpu().sum().item()
         else:
             correct += predicted.eq(targets.data).sum().item()
-        progressbar.set_description(f"Loss: {total_loss / (batch_idx + 1):.3f} | Acc: {100 * correct / total:.1f}%")
     acc = 100 * correct / total
     avg_loss = total_loss / total
     return acc, avg_loss

@@ -18,7 +18,8 @@ from training import run_epoch
 
 
 def train(average_size, mode, subsection, use_pretrained):
-    print(f"Average size: {average_size}, mode: {mode}")
+    print_header = f"Average size: {average_size}, mode: {mode}"
+    print(print_header)
     t00 = time()
     writer = SummaryWriter(f"data/logs/avg{average_size}_{mode}")
 
@@ -82,17 +83,16 @@ def train(average_size, mode, subsection, use_pretrained):
     best_val = 0
     no_improvement = 0
     max_no_improvement = 5
-    print('Starting fine-tuning!')
     for epoch in range(epochs):
-        print(' Epoch {}: {:0.2f}s'.format(epoch+1, time()-t0))
+        print(f'{print_header} Epoch {epoch+1}: {time()-t0:0.2f}s')
         # Train
         acc_tr, loss_tr = run_epoch(epoch, cnn, dl_tr, cuda,
                                     training=True, optimizer=optimizer)
-        print('  Train acc: {:0.2f}'.format(acc_tr))
+        print(f'{print_header}  Train acc: {acc_tr:0.2f}')
         # Val
         acc_val, loss_val = run_epoch(epoch, cnn, dl_val, cuda,
                                     training=False, optimizer=optimizer)
-        print('  Val acc  : {:0.2f}'.format(acc_val))
+        print(f'{print_header}  Val acc  : {acc_val:0.2f}')
         loss_data = {'Training': loss_tr, 'Validation': loss_val}
         accuracy_data = {'Training': acc_tr, 'Validation': acc_val}
         writer.add_scalars('Loss', loss_data, epoch+1)
