@@ -58,6 +58,6 @@ def preprocess(average_size, convolved=False, random=False, random_count=1000, t
     np.savez(filename, X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val)
 
 if __name__ == '__main__':
-    for average_size in [5, 10, 15, 20]:
-        for convolved in [True, False]:
-            preprocess(average_size, convolved)
+    for average_size in [1, 2, 3, 4, 5]:
+        for mode in ['normal', 'convolved', 'random']:
+            preprocess(average_size, convolved=(True if mode == 'convolved' else False), random=(True if mode == 'random' else False), subsection='reference')
