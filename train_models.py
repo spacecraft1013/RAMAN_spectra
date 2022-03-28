@@ -105,7 +105,7 @@ def train(params, subsection, use_pretrained):
         else:
             no_improvement += 1
         if no_improvement >= max_no_improvement:
-            print('Finished after {} epochs!'.format(epoch+1))
+            print(f'{print_header} Finished after {epoch+1} epochs!')
             break
 
     print(
@@ -125,10 +125,9 @@ def train(params, subsection, use_pretrained):
 
 
 if __name__ == '__main__':
-    results_df = pd.DataFrame()
     size_search_space = [1, 2, 3, 4, 5]
     mode_search_space = ['normal', 'convolved', 'random']
-    subsection = 'finetune'
+    subsection = 'reference'
     use_pretrained = False
     model_params = []
 
@@ -140,9 +139,9 @@ if __name__ == '__main__':
     with mp.Pool(min(torch.cuda.device_count(), len(parameters), mp.cpu_count())) as pool:
         out_data = pool.map(partial(train, subsection=subsection, use_pretrained=use_pretrained), model_params)
 
-    average_size, mode, acc_tr, acc_val, loss_tr, loss_val = zip(*out_data)
+    average_size, mode, acc_tr, acc_val, loss_tr, loss_val = zip(*filter(None, out_data))
 
-    pd.DataFrame({'Average Size': average_size,
+    results_df = pd.DataFrame({'Average Size': average_size,
                   'Mode': mode,
                   'Train Accuracy': acc_tr,
                   'Validation Accuracy': acc_val,
