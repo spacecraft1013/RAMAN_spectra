@@ -50,7 +50,7 @@ def preprocess(average_size, convolved=False, random=False, random_count=1000, t
     y_val = np.concatenate(y_val)
 
     if convolved:
-        filename = f'F:/Datasets/RAMAN_data/{subsection}_avg{average_size}_convolved_.npz'
+        filename = f'F:/Datasets/RAMAN_data/{subsection}_avg{average_size}_convolved.npz'
     elif random:
         filename = f'F:/Datasets/RAMAN_data/{subsection}_avg{average_size}_random.npz'
     else:
