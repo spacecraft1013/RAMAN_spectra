@@ -125,6 +125,8 @@ def train(params, subsection, use_pretrained):
 
 
 if __name__ == '__main__':
+    mp.set_start_method('spawn')
+
     size_search_space = [1, 2, 3, 4, 5]
     mode_search_space = ['normal', 'convolved', 'random']
     subsection = 'reference'
@@ -136,7 +138,7 @@ if __name__ == '__main__':
     for parameters in itertools.product(size_search_space, mode_search_space):
         model_params.append(parameters)
 
-    with mp.Pool(min(torch.cuda.device_count(), len(parameters), mp.cpu_count())) as pool:
+    with mp.Pool(min(torch.cuda.device_count(), len(model_params), mp.cpu_count())) as pool:
         out_data = pool.map(partial(train, subsection=subsection, use_pretrained=use_pretrained), model_params)
 
     average_size, mode, acc_tr, acc_val, loss_tr, loss_val = zip(*filter(None, out_data))
