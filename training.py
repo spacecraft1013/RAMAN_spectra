@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def run_epoch(epoch, model, dataloader, cuda, training=False, optimizer=None):
+def run_epoch(epoch, model, dataloader, training=False, optimizer=None, device=0):
     if training:
         model.train()
     else:
@@ -14,7 +14,7 @@ def run_epoch(epoch, model, dataloader, cuda, training=False, optimizer=None):
     correct = 0
     total = 0
     for batch_idx, (inputs, targets) in enumerate(dataloader):
-        if cuda: inputs, targets = inputs.cuda(), targets.cuda()
+        inputs, targets = inputs.to(device), targets.to(device)
         inputs, targets = Variable(inputs), Variable(targets.long())
         outputs = model(inputs)
         loss = nn.CrossEntropyLoss()(outputs, targets)
@@ -26,10 +26,7 @@ def run_epoch(epoch, model, dataloader, cuda, training=False, optimizer=None):
         total_loss += loss.item()
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
-        if cuda:
-            correct += predicted.eq(targets.data).cpu().sum().item()
-        else:
-            correct += predicted.eq(targets.data).sum().item()
+        correct += predicted.eq(targets.data).cpu().sum().item()
     acc = 100 * correct / total
     avg_loss = total_loss / total
     return acc, avg_loss

@@ -17,9 +17,12 @@ from resnet import ResNet
 from training import run_epoch
 
 
-def train(average_size, mode, subsection, use_pretrained):
+def train(params, subsection, use_pretrained):
+    average_size, mode = params
     print_header = f"Average size: {average_size}, mode: {mode}"
-    print(print_header)
+    rank = mp.current_process()._identity[0]
+    print(f"{print_header} - rank: {rank}")
+    gpu = rank - 1
     t00 = time()
     writer = SummaryWriter(f"data/logs/avg{average_size}_{mode}")
 
@@ -56,14 +59,11 @@ def train(average_size, mode, subsection, use_pretrained):
     input_dim = 1000
     in_channels = 64
     n_classes = 30
-    os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(0)
-    cuda = torch.cuda.is_available()
 
     # Load trained weights for demo
     cnn = ResNet(hidden_sizes, num_blocks, input_dim=input_dim,
                 in_channels=in_channels, n_classes=n_classes)
-    if cuda:
-        cnn.cuda()
+    cnn.to(gpu)
     if use_pretrained:
         cnn.load_state_dict(torch.load(
             './data/models/pretrained_model.ckpt', map_location=lambda storage, loc: storage))
@@ -76,9 +76,9 @@ def train(average_size, mode, subsection, use_pretrained):
     optimizer = optim.Adam(cnn.parameters(), lr=1e-3, betas=(0.5, 0.999))
     # Set up dataloaders
     dl_tr = spectral_dataloader(X_train, y_train, idxs=None,
-                                batch_size=batch_size, shuffle=True)
+                                batch_size=batch_size, shuffle=True, num_workers=0)
     dl_val = spectral_dataloader(X_val, y_val, idxs=None,
-                                batch_size=batch_size, shuffle=False)
+                                batch_size=batch_size, shuffle=False, num_workers=0)
     # Fine-tune CNN for first fold
     best_val = 0
     no_improvement = 0
@@ -86,12 +86,12 @@ def train(average_size, mode, subsection, use_pretrained):
     for epoch in range(epochs):
         print(f'{print_header} Epoch {epoch+1}: {time()-t0:0.2f}s')
         # Train
-        acc_tr, loss_tr = run_epoch(epoch, cnn, dl_tr, cuda,
-                                    training=True, optimizer=optimizer)
+        acc_tr, loss_tr = run_epoch(epoch, cnn, dl_tr,
+                                    training=True, optimizer=optimizer, device=gpu)
         print(f'{print_header}  Train acc: {acc_tr:0.2f}')
         # Val
-        acc_val, loss_val = run_epoch(epoch, cnn, dl_val, cuda,
-                                    training=False, optimizer=optimizer)
+        acc_val, loss_val = run_epoch(epoch, cnn, dl_val,
+                                    training=False, optimizer=optimizer, device=gpu)
         print(f'{print_header}  Val acc  : {acc_val:0.2f}')
         loss_data = {'Training': loss_tr, 'Validation': loss_val}
         accuracy_data = {'Training': acc_tr, 'Validation': acc_val}
@@ -130,14 +130,15 @@ if __name__ == '__main__':
     mode_search_space = ['normal', 'convolved', 'random']
     subsection = 'finetune'
     use_pretrained = False
+    model_params = []
 
     np.random.seed(0)
 
     for parameters in itertools.product(size_search_space, mode_search_space):
-        average_size, mode = parameters
+        model_params.append(parameters)
 
     with mp.Pool(min(torch.cuda.device_count(), len(parameters), mp.cpu_count())) as pool:
-        out_data = pool.map(partial(train, subsection=subsection, use_pretrained=use_pretrained), parameters)
+        out_data = pool.map(partial(train, subsection=subsection, use_pretrained=use_pretrained), model_params)
 
     average_size, mode, acc_tr, acc_val, loss_tr, loss_val = zip(*out_data)
 
