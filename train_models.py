@@ -69,7 +69,7 @@ def train(params, subsection, use_pretrained):
             './data/models/pretrained_model.ckpt', map_location=lambda storage, loc: storage))
 
     # Train CNN
-    epochs = 30
+    epochs = 100
     batch_size = 10
     t0 = time()
     # Set up Adam optimizer
@@ -88,11 +88,11 @@ def train(params, subsection, use_pretrained):
         # Train
         acc_tr, loss_tr = run_epoch(epoch, cnn, dl_tr,
                                     training=True, optimizer=optimizer, device=gpu)
-        print(f'{print_header}  Train acc: {acc_tr:0.2f}')
+        print(f'{print_header}  Epoch {epoch+1}  Train acc: {acc_tr:0.2f}')
         # Val
         acc_val, loss_val = run_epoch(epoch, cnn, dl_val,
                                     training=False, optimizer=optimizer, device=gpu)
-        print(f'{print_header}  Val acc  : {acc_val:0.2f}')
+        print(f'{print_header}  Epoch {epoch+1}  Val acc  : {acc_val:0.2f}')
         loss_data = {'Training': loss_tr, 'Validation': loss_val}
         accuracy_data = {'Training': acc_tr, 'Validation': acc_val}
         writer.add_scalars('Loss', loss_data, epoch+1)
