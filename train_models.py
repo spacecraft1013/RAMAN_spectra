@@ -153,4 +153,4 @@ if __name__ == '__main__':
                   'Train Loss': loss_tr,
                   'Validation Loss': loss_val})
 
-    results_df.to_csv(f'results{"_noweights" if not use_pretrained else "_pretrained"}_{subsection}.csv', index=False)
+    results_df.to_csv(f'results{"_noweights" if not use_pretrained else "_pretrained"}_{subsection}_3000samples.csv', index=False)

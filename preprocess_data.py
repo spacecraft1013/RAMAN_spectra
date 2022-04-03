@@ -1,6 +1,6 @@
 import numpy as np
 
-def preprocess(average_size, convolved=False, random=False, random_count=1000, train_split=0.9, subsection='finetune'):
+def preprocess(average_size, convolved=False, random=False, random_count=3000, train_split=0.9, subsection='finetune'):
 
     assert not (convolved and random), "Either convolved or random should be True"
     assert subsection in ('finetune', 'reference'), "subsection should be either finetune or reference"
