@@ -60,7 +60,7 @@ for checkpoint_dir in os.listdir('./server_models'):
                     xticklabels=label, yticklabels=label)
     ax.xaxis.tick_top()
     plt.xticks(rotation=90)
-    plt.savefig('./figures/' + os.path.splitext(checkpoint_dir)[0] + '.jpg', dpi=1000, bbox_inches='tight')
+    plt.savefig('./figures/' + os.path.splitext(checkpoint_dir)[0] + '.png', dpi=1000, bbox_inches='tight', transparent=True)
 
 
     y_ab = np.asarray([ATCC_GROUPINGS[i] for i in y])
@@ -78,7 +78,7 @@ for checkpoint_dir in os.listdir('./server_models'):
                     xticklabels=label, yticklabels=label)
     ax.xaxis.tick_top()
     plt.xticks(rotation=90)
-    plt.savefig('./figures/' + os.path.splitext(checkpoint_dir)[0] + '_ab.jpg', dpi=1000, bbox_inches='tight')
+    plt.savefig('./figures/' + os.path.splitext(checkpoint_dir)[0] + '_ab.png', dpi=1000, bbox_inches='tight', transparent=True)
 
     plt.clf()
 
