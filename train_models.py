@@ -102,6 +102,9 @@ def train(params, subsection, use_pretrained):
         if acc_val > best_val or epoch == 0:
             best_val = acc_val
             no_improvement = 0
+            best_weights = cnn.state_dict()
+            best_acc = acc_val
+            best_loss = loss_val
         else:
             no_improvement += 1
         if no_improvement >= max_no_improvement:
@@ -118,10 +121,10 @@ def train(params, subsection, use_pretrained):
     else:
         outname = f'./data/models/model_{subsection}_average_{average_size}{"_noweights" if not use_pretrained else "_pretrained"}.ckpt'
 
-    torch.save({'weights': cnn.state_dict(), 'train_acc': acc_tr, 'val_acc': acc_val},
+    torch.save({'weights': best_weights, 'train_acc': acc_tr, 'val_acc': best_acc},
             outname)
 
-    return average_size, mode, acc_tr, acc_val, loss_tr, loss_val
+    return average_size, mode, acc_tr, best_acc, loss_tr, best_loss
 
 
 if __name__ == '__main__':
