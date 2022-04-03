@@ -1,7 +1,6 @@
-import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
-import matplotlib
+import seaborn as sns
 
 results_df = pd.read_csv('results_noweights_reference.csv')
 
